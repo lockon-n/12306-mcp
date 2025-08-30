@@ -736,8 +736,16 @@ async function make12306Request<T>(
     headers: Record<string, string> = {}
 ): Promise<T | null> {
     try {
+        const https = require('https');
+        
         const response = await axios.get(url + '?' + scheme.toString(), {
             headers: headers,
+            timeout: 30000,  // 30秒超时
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,  // 忽略SSL证书验证
+                family: 4,  // 强制IPv4
+                keepAlive: false,  // 禁用keep-alive
+            })
         });
         return (await response.data) as T;
     } catch (error) {
